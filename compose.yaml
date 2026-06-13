@@ -1,0 +1,39 @@
+services:
+  order-db:
+    image: postgres:17-alpine
+    container_name: order-service-db
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    image: chaika19/order-service:latest
+    container_name: ${IMAGE_NAME}
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - LIQUIBASE_ENABLED=${LIQUIBASE_ENABLED}
+      - SPRING_JPA_SHOW_SQL=${SPRING_JPA_SHOW_SQL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      order-db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
