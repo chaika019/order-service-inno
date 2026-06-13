@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: ${IMAGE_NAME:user_order-chaika-inno}
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/order_service_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:true}
+    change-log: classpath:changelog/db.changelog-master.yaml
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: ${SPRING_JPA_SHOW_SQL:false}
+        format_sql: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userServiceCB:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
