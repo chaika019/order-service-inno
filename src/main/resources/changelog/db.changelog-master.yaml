@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: changelog/changesets/v1_init_schema.sql
