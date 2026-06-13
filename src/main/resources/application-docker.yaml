@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  application:
+    name: orderservice
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://order-db:5432/order_service_db}
